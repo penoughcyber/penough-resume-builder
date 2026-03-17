@@ -1,0 +1,598 @@
+:root {
+  --primary-color: #2c3e50;
+  --accent-color: #34495e;
+  --bg-color: #f8f9fa;
+  --panel-bg: #ffffff;
+  --border-color: #e2e8f0;
+  --input-focus: #3498db;
+  --text-main: #2d3748;
+  --text-muted: #718096;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+  --radius: 8px;
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* PDF-specific constants */
+  --pdf-gray: rgb(127, 127, 127);
+  --page-w: 8.5in;
+  --page-h: 11in;
+  --content-top: 33.08pt;
+  --content-side: 30.19pt;
+  --name-top-margin: 12.85pt;
+  --contact-bottom-margin: 10.95pt;
+  --section-title-bottom-margin: 4.25pt;
+}
+
+@font-face {
+  font-family: "Latin Modern Roman";
+  src: url("assets/fonts/LMRoman10-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Latin Modern Roman";
+  src: url("assets/fonts/LMRoman10-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Latin Modern Roman";
+  src: url("assets/fonts/LMRoman10-Italic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Latin Modern Roman 12";
+  src: url("assets/fonts/LMRoman12-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Latin Modern Roman 9";
+  src: url("assets/fonts/LMRoman9-Italic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--text-main);
+  background: var(--bg-color);
+  min-height: 100vh;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 360px minmax(900px, 1fr);
+  min-height: 100vh;
+}
+
+.panel {
+  background: var(--panel-bg);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  z-index: 10;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+}
+
+.sidebar-header {
+  padding: 24px;
+  border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(135deg, #2c3e50 0%, #000000 100%);
+  color: white;
+}
+.sidebar-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.sidebar-header p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.panel-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+.panel-content::-webkit-scrollbar { width: 6px; }
+.panel-content::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+
+h1, h2, h3, h4 {
+  margin: 0;
+  font-weight: normal;
+}
+
+.muted {
+  color: var(--muted);
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+button,
+.upload-label {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  padding: 8px 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.upload-label {
+  display: inline-flex;
+  align-items: center;
+}
+
+#uploadJsonInput {
+  display: none;
+}
+
+/* ── Modern Form Controls ── */
+.form-card {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+.form-card:hover { border-color: #cbd5e0; }
+
+.section-header {
+  padding: 14px 20px;
+  background: #f8fafc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid transparent;
+  transition: var(--transition);
+}
+.section-header:hover { background: #f1f5f9; }
+.section-header h3 {
+  margin: 0;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.75px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+.section-header .toggle-icon {
+  font-size: 12px;
+  transition: transform 0.3s ease;
+  color: var(--text-muted);
+}
+.form-card.active .toggle-icon { transform: rotate(180deg); }
+.form-card.active .section-header { border-bottom-color: var(--border-color); background: white; }
+
+.section-content {
+  padding: 0 20px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0, 1, 0, 1);
+}
+.form-card.active .section-content {
+  padding: 20px;
+  max-height: 2000px;
+  transition: max-height 0.3s cubic-bezier(1, 0, 1, 0);
+}
+
+.field { margin-bottom: 16px; }
+.field:last-child { margin-bottom: 0; }
+.field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.field input, .field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text-main);
+  transition: var(--transition);
+  background: #fafbfc;
+}
+.field input:focus, .field textarea:focus {
+  outline: none;
+  border-color: var(--input-focus);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+.field textarea {
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+button, .upload-label {
+  padding: 10px 16px;
+  border: 1px solid var(--border-color);
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+button:hover, .upload-label:hover {
+  background: #f8fafc;
+  border-color: #cbd5e0;
+  box-shadow: var(--shadow-sm);
+}
+.btn-primary {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+.btn-primary:hover {
+  background: #1a252f;
+  border-color: #1a252f;
+}
+
+.preview-wrap {
+  padding: 20px;
+  overflow: auto;
+}
+
+.preview-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #374151;
+}
+
+.cv-page {
+  width: var(--page-w);
+  min-height: var(--page-h);
+  background: #fff;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+  margin: 0 auto;
+  padding: var(--content-top) var(--content-side) 16pt;
+  position: relative;
+  line-height: 1.15;
+  font-family: "Latin Modern Roman", "Times New Roman", Times, serif;
+  font-size: 9.96pt;
+  display: flex;
+  flex-direction: column;
+}
+
+header, main, footer {
+  display: block;
+}
+
+address {
+  font-style: normal;
+}
+
+.cv-updated-top {
+  position: absolute;
+  top: calc(var(--content-top) - 1pt);
+  right: var(--content-side);
+  font-family: "Latin Modern Roman 9", "Latin Modern Roman", serif;
+  font-size: 8.97pt;
+  color: var(--pdf-gray);
+  font-style: italic;
+}
+
+.cv-name {
+  text-align: center;
+  font-family: "Latin Modern Roman 12", "Latin Modern Roman", serif;
+  font-size: 23.91pt;
+  line-height: 1;
+  font-weight: 700;
+  margin: var(--name-top-margin) 0 8.2pt;
+}
+
+.cv-tagline {
+  text-align: center;
+  font-family: "Latin Modern Roman", serif;
+  font-style: italic;
+  font-size: 9.96pt;
+  margin: 0 0 2pt;
+}
+
+.cv-contact {
+  text-align: center;
+  border-bottom: 1px solid #000;
+  padding-bottom: 6.5pt;
+  margin-bottom: var(--contact-bottom-margin);
+  font-size: 9.96pt;
+}
+
+.cv-contact-line {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 10pt;
+  flex-wrap: wrap;
+}
+
+.cv-contact-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2pt;
+  white-space: normal;
+}
+
+.cv-contact-subline {
+  margin-top: 4.1pt;
+  font-size: 9.96pt;
+}
+
+.cv-meta-line {
+  text-align: right;
+  margin-top: -6pt;
+  margin-bottom: 6pt;
+  font-family: "Latin Modern Roman 9", "Latin Modern Roman", serif;
+  font-style: italic;
+  font-size: 8.97pt;
+  color: var(--pdf-gray);
+}
+
+.cv-contact a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cv-contact-icon {
+  font-size: 7.97pt;
+  width: 1em;
+  text-align: center;
+  display: inline-block;
+  pointer-events: none; /* Helps PDF text selection */
+}
+
+.sep {
+  margin: 0 6pt;
+  color: #666;
+  font-weight: normal;
+}
+
+.cv-section {
+  margin-bottom: 7.5pt;
+}
+
+.cv-section-title {
+  font-family: "Latin Modern Roman 12", "Latin Modern Roman", serif;
+  font-size: 11.96pt;
+  font-weight: 700;
+  margin: 0 0 var(--section-title-bottom-margin);
+  border-bottom: 1px solid #6f6f6f;
+  padding-bottom: 2.2pt;
+  text-rendering: optimizeLegibility;
+}
+
+.cv-paragraph {
+  margin: 0;
+  font-size: 9.96pt;
+  text-align: justify;
+}
+
+.role-title, .item-title, h3 {
+  font-family: "Latin Modern Roman", serif;
+  font-size: 9.96pt;
+  font-weight: 700;
+  margin: 0;
+}
+
+.role-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12pt;
+}
+
+.role-sub-row {
+  font-style: italic;
+  font-size: 8.96pt;
+  margin-bottom: 2pt;
+}
+
+.role-location, .role-date {
+  text-align: right;
+  font-style: italic;
+  font-size: 8.96pt;
+  white-space: nowrap;
+}
+
+.role-company {
+  font-family: "Latin Modern Roman", serif;
+  font-style: italic;
+  font-size: 9.96pt;
+  margin-top: 0;
+}
+
+.role-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 9.96pt;
+  margin-top: 1pt;
+}
+
+.role-meta strong,
+.item-meta strong,
+.skills-line strong,
+.focus-line strong {
+  font-family: "Latin Modern Roman", serif;
+  font-weight: 700;
+}
+
+.bullets {
+  list-style: none;
+  margin: 3pt 0 4pt 16pt;
+  padding: 0;
+  font-size: 9.96pt;
+}
+
+.bullets li {
+  margin: 1.5pt 0;
+  position: relative;
+  padding-left: 10pt;
+}
+
+.bullets li::before {
+  content: "\25E6";
+  position: absolute;
+  left: -2pt;
+  top: 0;
+}
+
+.focus-line {
+  font-size: 9.96pt;
+  margin: 0 0 6pt;
+}
+
+.focus-line strong {
+  font-weight: 700;
+}
+
+.item-row {
+  margin-bottom: 7pt;
+}
+
+.item-title-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.item-title {
+  font-family: "LMRoman10-Bold", "Times New Roman", Times, serif;
+  font-size: 9.96pt;
+  font-weight: 700;
+}
+
+.item-status {
+  font-family: "Latin Modern Roman", serif;
+  font-style: italic;
+  font-size: 9.96pt;
+}
+
+.item-meta {
+  font-size: 9.96pt;
+  margin: 1pt 0;
+}
+
+.link {
+  color: var(--link);
+  text-decoration: none;
+  font-family: "LMRoman10-Regular", "Times New Roman", Times, serif;
+}
+
+.skills-line,
+.cert-line {
+  font-size: 9.96pt;
+  margin: 2pt 0;
+}
+
+.footer-note {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: "Latin Modern Roman 9", "Latin Modern Roman", serif;
+  font-style: italic;
+  font-size: 8.97pt;
+  color: var(--pdf-gray);
+  pointer-events: none; /* Prevents blocking text selection */
+}
+
+@media print {
+  @page {
+    size: Letter;
+    margin: 0;
+  }
+
+  body {
+    background: #fff;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .panel,
+  .preview-toolbar,
+  .no-print {
+    display: none !important;
+  }
+
+  .app-shell {
+    display: block !important;
+    overflow: visible !important;
+  }
+
+  .preview-wrap {
+    padding: 0 !important;
+    overflow: visible !important;
+    margin: 0 !important;
+  }
+
+  .cv-page {
+    margin: 0 !important;
+    box-shadow: none !important;
+    width: 8.5in !important;
+    min-height: 11in !important;
+    padding: var(--content-top) var(--content-side) 0 !important;
+    border: none !important;
+    page-break-after: always;
+    overflow: visible !important;
+    position: relative !important;
+    display: block !important; /* Block is safer for PDF text streams than Flex */
+  }
+}
