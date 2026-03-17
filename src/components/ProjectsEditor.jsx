@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react';
 import FormField from './FormField';
 
 const BLANK_PROJECT = {
@@ -13,7 +14,21 @@ const textToBullets = (text) =>
   text.split('\n').map((l) => l.replace(/^[-•◦]\s*/, '').trimEnd()).filter(Boolean);
 
 export default function ProjectsEditor({ projects = [], onChange }) {
+  const [openIndex, setOpenIndex] = useState(null);
+  const [rawBullets, setRawBullets] = useState('');
+  const rawBulletsRef = useRef('');
+  rawBulletsRef.current = rawBullets;
   const list = projects;
+
+  const openBullets = openIndex !== null ? list[openIndex]?.bullets : null;
+  useEffect(() => {
+    if (openIndex === null) { setRawBullets(''); return; }
+    const incoming = list[openIndex]?.bullets || [];
+    if (JSON.stringify(textToBullets(rawBulletsRef.current)) !== JSON.stringify(incoming)) {
+      setRawBullets(bulletsToText(incoming));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openIndex, openBullets]);
 
   const updateAt = (index, field, value) => {
     const next = list.map((p, i) =>
@@ -22,8 +37,20 @@ export default function ProjectsEditor({ projects = [], onChange }) {
     onChange(next);
   };
 
-  const addEntry = () => onChange([...list, { ...BLANK_PROJECT }]);
-  const removeEntry = (index) => onChange(list.filter((_, i) => i !== index));
+  const addEntry = () => {
+    const newIndex = list.length;
+    onChange([...list, { ...BLANK_PROJECT }]);
+    setOpenIndex(newIndex);
+    setRawBullets('');
+  };
+
+  const removeEntry = (index) => {
+    onChange(list.filter((_, i) => i !== index));
+    setOpenIndex(null);
+    setRawBullets('');
+  };
+
+  const toggle = (i) => setOpenIndex((prev) => (prev === i ? null : i));
 
   return (
     <div className="list-editor">
@@ -52,74 +79,122 @@ export default function ProjectsEditor({ projects = [], onChange }) {
         </div>
       )}
 
-      {list.map((proj, index) => (
-        <div key={index} className={`entry-card ${proj.hidden ? 'entry-card--hidden' : ''}`}>
-          <div className="entry-card__header">
-            <div className="entry-card__meta">
-              <span className="entry-card__num">{index + 1}</span>
-              <span className="entry-card__title-preview">
-                {proj.name || 'New Project'}
-              </span>
-              {proj.hidden && <span className="entry-card__hidden-badge">Hidden from CV</span>}
-            </div>
-            <div className="entry-card__actions">
-              <button
-                type="button"
-                className={`entry-card__vis-btn ${proj.hidden ? 'entry-card__vis-btn--off' : ''}`}
-                onClick={() => updateAt(index, 'hidden', !proj.hidden)}
-                title={proj.hidden ? 'Show on CV' : 'Hide from CV'}
+      <div className="exp-list">
+        {list.map((proj, index) => {
+          const isOpen = openIndex === index;
+          return (
+            <div
+              key={index}
+              className={`exp-entry ${proj.hidden ? 'exp-entry--hidden' : ''} ${isOpen ? 'exp-entry--open' : ''}`}
+            >
+              {/* Compact row */}
+              <div
+                className="exp-entry__row"
+                onClick={() => toggle(index)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && toggle(index)}
+                aria-expanded={isOpen}
               >
-                <i className={`fas ${proj.hidden ? 'fa-eye-slash' : 'fa-eye'}`} />
-              </button>
-              <button
-                type="button"
-                className="entry-card__remove"
-                onClick={() => removeEntry(index)}
-                aria-label={`Remove project ${index + 1}`}
-                title="Remove"
-              >
-                <i className="fas fa-trash-alt" />
-              </button>
+                <span className="exp-entry__grip" aria-hidden="true">
+                  <i className="fas fa-grip-vertical" />
+                </span>
+                <div className="exp-entry__label">
+                  <span className="exp-entry__role">
+                    {proj.name || 'New Project'}
+                  </span>
+                  {proj.linkUrl && (
+                    <span className="exp-entry__company"> · {proj.linkLabel || proj.linkUrl}</span>
+                  )}
+                  {proj.hidden && (
+                    <span className="exp-entry__hidden-badge">Hidden</span>
+                  )}
+                </div>
+                <div
+                  className="exp-entry__row-actions"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    type="button"
+                    className={`exp-entry__vis-btn ${proj.hidden ? 'exp-entry__vis-btn--off' : ''}`}
+                    onClick={() => updateAt(index, 'hidden', !proj.hidden)}
+                    title={proj.hidden ? 'Show on CV' : 'Hide from CV'}
+                  >
+                    <i className={`fas ${proj.hidden ? 'fa-eye-slash' : 'fa-eye'}`} />
+                  </button>
+                  <span className="exp-entry__chevron">
+                    <i className={`fas fa-chevron-${isOpen ? 'up' : 'down'}`} />
+                  </span>
+                </div>
+              </div>
+
+              {/* Expanded edit form */}
+              {isOpen && (
+                <div className="exp-entry__form">
+                  <div className="exp-entry__form-header">
+                    <span className="exp-entry__form-title">
+                      <i className="fas fa-pen" /> Edit Entry
+                    </span>
+                    <button
+                      type="button"
+                      className="entry-card__remove"
+                      onClick={() => removeEntry(index)}
+                      title="Delete this entry"
+                    >
+                      <i className="fas fa-trash-alt" />
+                    </button>
+                  </div>
+
+                  <div className="entry-card__row entry-card__row--2">
+                    <FormField
+                      id={`proj-name-${index}`}
+                      label="Project Name"
+                      value={proj.name}
+                      onChange={(v) => updateAt(index, 'name', v)}
+                      placeholder="e.g. Triage-Bot"
+                    />
+                    <FormField
+                      id={`proj-linkLabel-${index}`}
+                      label="Link Label"
+                      value={proj.linkLabel}
+                      onChange={(v) => updateAt(index, 'linkLabel', v)}
+                      placeholder="e.g. View Code"
+                      optional
+                    />
+                  </div>
+
+                  <FormField
+                    id={`proj-linkUrl-${index}`}
+                    label="Link URL"
+                    value={proj.linkUrl}
+                    onChange={(v) => updateAt(index, 'linkUrl', v)}
+                    placeholder="https://github.com/..."
+                    optional
+                  />
+
+                  <FormField
+                    id={`proj-bullets-${index}`}
+                    label="Achievements"
+                    value={rawBullets}
+                    onChange={(v) => { setRawBullets(v); updateAt(index, 'bullets', textToBullets(v)); }}
+                    rows={4}
+                    placeholder={'One achievement per line:\nBuilt a CLI tool used by 500+ professionals…\nImplemented Docker-based deployment…'}
+                    hint="Each line becomes a separate bullet point on your CV."
+                  />
+
+                  <button
+                    type="button"
+                    className="exp-entry__done-btn"
+                    onClick={() => setOpenIndex(null)}
+                  >
+                    <i className="fas fa-check" /> Done
+                  </button>
+                </div>
+              )}
             </div>
-          </div>
-          <div className="entry-card__body">
-            <div className="entry-card__row entry-card__row--2">
-              <FormField
-                id={`proj-name-${index}`}
-                label="Project Name"
-                value={proj.name}
-                onChange={(v) => updateAt(index, 'name', v)}
-                placeholder="e.g. Triage-Bot"
-              />
-              <FormField
-                id={`proj-linkLabel-${index}`}
-                label="Link Label"
-                value={proj.linkLabel}
-                onChange={(v) => updateAt(index, 'linkLabel', v)}
-                placeholder="e.g. View Code"
-                optional
-              />
-            </div>
-            <FormField
-              id={`proj-linkUrl-${index}`}
-              label="Link URL"
-              value={proj.linkUrl}
-              onChange={(v) => updateAt(index, 'linkUrl', v)}
-              placeholder="https://github.com/..."
-              optional
-            />
-            <FormField
-              id={`proj-bullets-${index}`}
-              label="Achievements"
-              value={bulletsToText(proj.bullets)}
-              onChange={(v) => updateAt(index, 'bullets', textToBullets(v))}
-              rows={4}
-              placeholder={'One achievement per line:\nBuilt a CLI tool used by 500+ professionals…\nImplemented Docker-based deployment…'}
-              hint="Each line becomes a separate bullet point on your CV."
-            />
-          </div>
-        </div>
-      ))}
+          );
+        })}
+      </div>
     </div>
   );
 }

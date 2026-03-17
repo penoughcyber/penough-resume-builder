@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import FormField from './FormField';
 
 const BLANK_HIGHLIGHT = {
@@ -10,6 +11,7 @@ const BLANK_HIGHLIGHT = {
 };
 
 export default function HighlightsEditor({ highlights = [], onChange }) {
+  const [openIndex, setOpenIndex] = useState(null);
   const list = highlights;
 
   const updateAt = (index, field, value) => {
@@ -19,8 +21,18 @@ export default function HighlightsEditor({ highlights = [], onChange }) {
     onChange(next);
   };
 
-  const addEntry = () => onChange([...list, { ...BLANK_HIGHLIGHT }]);
-  const removeEntry = (index) => onChange(list.filter((_, i) => i !== index));
+  const addEntry = () => {
+    const newIndex = list.length;
+    onChange([...list, { ...BLANK_HIGHLIGHT }]);
+    setOpenIndex(newIndex);
+  };
+
+  const removeEntry = (index) => {
+    onChange(list.filter((_, i) => i !== index));
+    setOpenIndex(null);
+  };
+
+  const toggle = (i) => setOpenIndex((prev) => (prev === i ? null : i));
 
   return (
     <div className="list-editor">
@@ -49,83 +61,130 @@ export default function HighlightsEditor({ highlights = [], onChange }) {
         </div>
       )}
 
-      {list.map((h, index) => (
-        <div key={index} className={`entry-card entry-card--compact ${h.hidden ? 'entry-card--hidden' : ''}`}>
-          <div className="entry-card__header">
-            <div className="entry-card__meta">
-              <span className="entry-card__num">{index + 1}</span>
-              <span className="entry-card__title-preview">
-                {h.title || 'New Achievement'}
-                {h.status && <span className="entry-card__at"> · {h.status}</span>}
-              </span>
-              {h.hidden && <span className="entry-card__hidden-badge">Hidden from CV</span>}
-            </div>
-            <div className="entry-card__actions">
-              <button
-                type="button"
-                className={`entry-card__vis-btn ${h.hidden ? 'entry-card__vis-btn--off' : ''}`}
-                onClick={() => updateAt(index, 'hidden', !h.hidden)}
-                title={h.hidden ? 'Show on CV' : 'Hide from CV'}
+      <div className="exp-list">
+        {list.map((h, index) => {
+          const isOpen = openIndex === index;
+          return (
+            <div
+              key={index}
+              className={`exp-entry ${h.hidden ? 'exp-entry--hidden' : ''} ${isOpen ? 'exp-entry--open' : ''}`}
+            >
+              {/* Compact row */}
+              <div
+                className="exp-entry__row"
+                onClick={() => toggle(index)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && toggle(index)}
+                aria-expanded={isOpen}
               >
-                <i className={`fas ${h.hidden ? 'fa-eye-slash' : 'fa-eye'}`} />
-              </button>
-              <button
-                type="button"
-                className="entry-card__remove"
-                onClick={() => removeEntry(index)}
-                aria-label={`Remove entry ${index + 1}`}
-                title="Remove"
-              >
-                <i className="fas fa-trash-alt" />
-              </button>
+                <span className="exp-entry__grip" aria-hidden="true">
+                  <i className="fas fa-grip-vertical" />
+                </span>
+                <div className="exp-entry__label">
+                  <span className="exp-entry__role">
+                    {h.title || 'New Achievement'}
+                  </span>
+                  {h.status && (
+                    <span className="exp-entry__company"> · {h.status}</span>
+                  )}
+                  {h.hidden && (
+                    <span className="exp-entry__hidden-badge">Hidden</span>
+                  )}
+                </div>
+                <div
+                  className="exp-entry__row-actions"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    type="button"
+                    className={`exp-entry__vis-btn ${h.hidden ? 'exp-entry__vis-btn--off' : ''}`}
+                    onClick={() => updateAt(index, 'hidden', !h.hidden)}
+                    title={h.hidden ? 'Show on CV' : 'Hide from CV'}
+                  >
+                    <i className={`fas ${h.hidden ? 'fa-eye-slash' : 'fa-eye'}`} />
+                  </button>
+                  <span className="exp-entry__chevron">
+                    <i className={`fas fa-chevron-${isOpen ? 'up' : 'down'}`} />
+                  </span>
+                </div>
+              </div>
+
+              {/* Expanded edit form */}
+              {isOpen && (
+                <div className="exp-entry__form">
+                  <div className="exp-entry__form-header">
+                    <span className="exp-entry__form-title">
+                      <i className="fas fa-pen" /> Edit Entry
+                    </span>
+                    <button
+                      type="button"
+                      className="entry-card__remove"
+                      onClick={() => removeEntry(index)}
+                      title="Delete this entry"
+                    >
+                      <i className="fas fa-trash-alt" />
+                    </button>
+                  </div>
+
+                  <div className="entry-card__row entry-card__row--2">
+                    <FormField
+                      id={`hl-title-${index}`}
+                      label="Title"
+                      value={h.title}
+                      onChange={(v) => updateAt(index, 'title', v)}
+                      placeholder="e.g. CISSP Certification"
+                    />
+                    <FormField
+                      id={`hl-status-${index}`}
+                      label="Status / Date"
+                      value={h.status}
+                      onChange={(v) => updateAt(index, 'status', v)}
+                      placeholder="e.g. Certified 2023"
+                    />
+                  </div>
+
+                  <FormField
+                    id={`hl-desc-${index}`}
+                    label="Description"
+                    value={h.description}
+                    onChange={(v) => updateAt(index, 'description', v)}
+                    rows={3}
+                    placeholder="Brief description..."
+                  />
+
+                  <div className="entry-card__row entry-card__row--2">
+                    <FormField
+                      id={`hl-linkLabel-${index}`}
+                      label="Link Label"
+                      value={h.linkLabel}
+                      onChange={(v) => updateAt(index, 'linkLabel', v)}
+                      placeholder="e.g. View Certificate"
+                      optional
+                    />
+                    <FormField
+                      id={`hl-linkUrl-${index}`}
+                      label="Link URL"
+                      value={h.linkUrl}
+                      onChange={(v) => updateAt(index, 'linkUrl', v)}
+                      placeholder="https://..."
+                      optional
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    className="exp-entry__done-btn"
+                    onClick={() => setOpenIndex(null)}
+                  >
+                    <i className="fas fa-check" /> Done
+                  </button>
+                </div>
+              )}
             </div>
-          </div>
-          <div className="entry-card__body">
-            <div className="entry-card__row entry-card__row--2">
-              <FormField
-                id={`hl-title-${index}`}
-                label="Title"
-                value={h.title}
-                onChange={(v) => updateAt(index, 'title', v)}
-                placeholder="e.g. CISSP Certification"
-              />
-              <FormField
-                id={`hl-status-${index}`}
-                label="Status / Date"
-                value={h.status}
-                onChange={(v) => updateAt(index, 'status', v)}
-                placeholder="e.g. Certified 2023"
-              />
-            </div>
-            <FormField
-              id={`hl-desc-${index}`}
-              label="Description"
-              value={h.description}
-              onChange={(v) => updateAt(index, 'description', v)}
-              rows={3}
-              placeholder="Brief description..."
-            />
-            <div className="entry-card__row entry-card__row--2">
-              <FormField
-                id={`hl-linkLabel-${index}`}
-                label="Link Label"
-                value={h.linkLabel}
-                onChange={(v) => updateAt(index, 'linkLabel', v)}
-                placeholder="e.g. View Certificate"
-                optional
-              />
-              <FormField
-                id={`hl-linkUrl-${index}`}
-                label="Link URL"
-                value={h.linkUrl}
-                onChange={(v) => updateAt(index, 'linkUrl', v)}
-                placeholder="https://..."
-                optional
-              />
-            </div>
-          </div>
-        </div>
-      ))}
+          );
+        })}
+      </div>
     </div>
   );
 }

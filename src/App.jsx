@@ -7,17 +7,47 @@ import { sampleData, emptyData } from './data/sampleData';
 import { loadState, saveState, saveSnapshot, loadSnapshot, clearSnapshot, hasSnapshot } from './utils/storage';
 
 function computeCompletion(data) {
-  const checks = [
-    !!(data.name?.trim()),
-    !!(data.email?.trim() || data.phone?.trim()),
-    !!(data.tagline?.trim()),
-    !!(data.address?.trim()),
-    !!(data.objective?.trim()),
-    !!(data.interests?.trim() || data.competencies?.trim()),
-    data.experiences?.length > 0 && !!data.experiences[0]?.role,
-    data.education?.length > 0 && !!data.education[0]?.school,
-  ];
-  return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+  // Each field carries a weight; total adds up to 100.
+  let score = 0;
+
+  const has = (v) => typeof v === 'string' && v.trim().length > 0;
+
+  // Personal info — 28 pts
+  if (has(data.name))                                   score += 10;
+  if (has(data.email) || has(data.phone))               score += 8;
+  if (has(data.tagline))                                score += 5;
+  if (has(data.address))                                score += 5;
+
+  // Professional profile — 15 pts
+  if (has(data.objective))                              score += 15;
+
+  // Experience — 25 pts
+  const exps = (data.experiences || []).filter(e => has(e.role));
+  if (exps.length >= 1)                                 score += 10;
+  if (exps.length >= 1 && (exps[0].bullets || []).length > 0) score += 8;
+  if (exps.length >= 2)                                 score += 7;
+
+  // Education — 15 pts
+  if ((data.education || []).some(e => has(e.school)))  score += 15;
+
+  // Skills & proficiencies — 10 pts
+  if (has(data.interests) || has(data.competencies) || has(data.technologies)) score += 10;
+
+  // Extras — 7 pts
+  if (has(data.linkedin) || has(data.github) || has(data.googleScholar)) score += 3;
+  if ((data.certifications || []).length > 0 || (data.highlights || []).length > 0) score += 4;
+
+  return Math.min(100, score);
+}
+
+function completionLabel(pct) {
+  if (pct === 0)   return 'Not started';
+  if (pct < 20)    return 'Just getting started';
+  if (pct < 40)    return 'Taking shape';
+  if (pct < 60)    return 'Halfway there';
+  if (pct < 80)    return 'Looking good';
+  if (pct < 100)   return 'Almost complete';
+  return 'Complete!';
 }
 
 export default function App() {
@@ -28,6 +58,7 @@ export default function App() {
   const saveTimer = useRef(null);
 
   const completion = computeCompletion(data);
+  const label = completionLabel(completion);
 
   useEffect(() => {
     setSaveStatus('saving');
@@ -143,7 +174,7 @@ export default function App() {
         {/* Progress bar */}
         <div className="progress-bar-wrap">
           <div className="progress-bar-wrap__labels">
-            <span>Profile completion</span>
+            <span className="progress-bar-wrap__status">{label}</span>
             <span className="progress-bar-wrap__pct">{completion}%</span>
           </div>
           <div className="progress-track">

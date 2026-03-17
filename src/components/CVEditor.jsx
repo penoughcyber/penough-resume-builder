@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import FormSection from './FormSection';
 import FormField from './FormField';
 import ExperienceEditor from './ExperienceEditor';
@@ -42,25 +42,28 @@ export default function CVEditor({ data, onDataChange }) {
   const st = data.sectionTitles;
 
   // Local raw-text state keeps trailing newlines alive while typing.
-  // Syncs back from data when an external action (Demo, Import) changes
-  // the underlying array to something different from what the raw text parses to.
+  // Refs mirror the state so useEffect never reads a stale closure value.
   const [certsRaw, setCertsRaw] = useState(() => (data.certifications || []).join('\n'));
-  const [volRaw, setVolRaw] = useState(() => (data.volunteering || []).join('\n'));
+  const [volRaw, setVolRaw]     = useState(() => (data.volunteering  || []).join('\n'));
+  const certsRawRef = useRef(certsRaw);
+  const volRawRef   = useRef(volRaw);
+  certsRawRef.current = certsRaw;
+  volRawRef.current   = volRaw;
 
+  // Only sync when an external action (Demo / Import / Clear) changes the array
+  // to content different from what the current raw text already represents.
   useEffect(() => {
     const incoming = data.certifications || [];
-    if (JSON.stringify(arrayFromText(certsRaw)) !== JSON.stringify(incoming)) {
+    if (JSON.stringify(arrayFromText(certsRawRef.current)) !== JSON.stringify(incoming)) {
       setCertsRaw(incoming.join('\n'));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.certifications]);
 
   useEffect(() => {
     const incoming = data.volunteering || [];
-    if (JSON.stringify(arrayFromText(volRaw)) !== JSON.stringify(incoming)) {
+    if (JSON.stringify(arrayFromText(volRawRef.current)) !== JSON.stringify(incoming)) {
       setVolRaw(incoming.join('\n'));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.volunteering]);
 
   const toggle = (title) =>
@@ -160,11 +163,28 @@ export default function CVEditor({ data, onDataChange }) {
         {textField('address', 'Location (City, Country)')}
         {textField('email', 'Email Address')}
         {textField('phone', 'Phone Number')}
-        {textField('website', 'Work Website', true)}
-        {textField('linkedin', 'LinkedIn Profile', true)}
-        {textField('github', 'GitHub / Portfolio', true)}
-        {textField('googleScholar', 'Google Scholar', true)}
-        {textField('portfolio', 'Additional Link', true)}
+
+        <div className="link-field-group">
+          {textField('website', 'Work Website', true)}
+          <FormField id="websiteLabel" label="Display Text" value={data.websiteLabel} onChange={(v) => handleChange('websiteLabel', v)} placeholder="e.g. My Website" optional />
+        </div>
+        <div className="link-field-group">
+          {textField('linkedin', 'LinkedIn Profile', true)}
+          <FormField id="linkedinLabel" label="Display Text" value={data.linkedinLabel} onChange={(v) => handleChange('linkedinLabel', v)} placeholder="e.g. Ashfaq Hossain" optional />
+        </div>
+        <div className="link-field-group">
+          {textField('github', 'GitHub', true)}
+          <FormField id="githubLabel" label="Display Text" value={data.githubLabel} onChange={(v) => handleChange('githubLabel', v)} placeholder="e.g. ashfaq-dev" optional />
+        </div>
+        <div className="link-field-group">
+          {textField('googleScholar', 'Google Scholar', true)}
+          <FormField id="googleScholarLabel" label="Display Text" value={data.googleScholarLabel} onChange={(v) => handleChange('googleScholarLabel', v)} placeholder="e.g. Scholar Profile" optional />
+        </div>
+        <div className="link-field-group">
+          {textField('portfolio', 'Additional Link', true)}
+          <FormField id="portfolioLabel" label="Display Text" value={data.portfolioLabel} onChange={(v) => handleChange('portfolioLabel', v)} placeholder="e.g. Portfolio" optional />
+        </div>
+
         {textField('updatedLabel', 'Revision Date')}
       </FormSection>
 

@@ -87,12 +87,17 @@ export default function CVPreview({ data }) {
     { key: 'email', value: data?.email, link: true },
   ].filter((x) => x.value);
 
+  const LINK_DEFAULTS = {
+    website: 'Website', linkedin: 'LinkedIn', github: 'GitHub',
+    googleScholar: 'Google Scholar', portfolio: 'Portfolio',
+  };
+
   const contactLine2 = [
-    { key: 'website', value: data?.website, link: true },
-    { key: 'linkedin', value: data?.linkedin, link: true },
-    { key: 'github', value: data?.github, link: true },
-    { key: 'googleScholar', value: data?.googleScholar, link: true },
-    { key: 'portfolio', value: data?.portfolio, link: true },
+    { key: 'website',       value: data?.website,       displayLabel: data?.websiteLabel       || LINK_DEFAULTS.website,       link: true },
+    { key: 'linkedin',      value: data?.linkedin,      displayLabel: data?.linkedinLabel      || LINK_DEFAULTS.linkedin,      link: true },
+    { key: 'github',        value: data?.github,        displayLabel: data?.githubLabel        || LINK_DEFAULTS.github,        link: true },
+    { key: 'googleScholar', value: data?.googleScholar, displayLabel: data?.googleScholarLabel || LINK_DEFAULTS.googleScholar, link: true },
+    { key: 'portfolio',     value: data?.portfolio,     displayLabel: data?.portfolioLabel     || LINK_DEFAULTS.portfolio,     link: true },
   ].filter((x) => x.value);
 
   const buildContactHtml = (items) =>
@@ -100,10 +105,10 @@ export default function CVPreview({ data }) {
       .map((x) => {
         const iconClass = CONTACT_ICONS[x.key] || 'fas fa-circle';
         const icon = `<i class="${iconClass} cv-contact-icon" aria-hidden="true"></i>`;
-        const label = x.key.charAt(0).toUpperCase() + x.key.slice(1);
+        const srLabel = x.key.charAt(0).toUpperCase() + x.key.slice(1);
         const content = x.link
-          ? `<a href="${esc(asHref(x.value))}" target="_blank" rel="noreferrer"><span class="sr-only">${label}: </span>${esc(x.value)}</a>`
-          : `<span class="sr-only">${label}: </span>${esc(x.value)}`;
+          ? `<a href="${esc(asHref(x.value))}" target="_blank" rel="noreferrer"><span class="sr-only">${srLabel}: </span>${esc(x.displayLabel || x.value)}</a>`
+          : `<span class="sr-only">${srLabel}: </span>${esc(x.value)}`;
         return `<span class="cv-contact-item">${icon}${content}</span>`;
       })
       .join('<span class="sep">|</span>');

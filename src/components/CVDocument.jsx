@@ -298,12 +298,17 @@ export default function CVDocument({ data }) {
     { key: 'email',   value: data?.email,   link: true  },
   ].filter((x) => x.value);
 
+  const LINK_DEFAULTS = {
+    website: 'Website', linkedin: 'LinkedIn', github: 'GitHub',
+    googleScholar: 'Google Scholar', portfolio: 'Portfolio',
+  };
+
   const contactLine2 = [
-    { key: 'website',       value: data?.website,       link: true },
-    { key: 'linkedin',      value: data?.linkedin,      link: true },
-    { key: 'github',        value: data?.github,        link: true },
-    { key: 'googleScholar', value: data?.googleScholar, link: true },
-    { key: 'portfolio',     value: data?.portfolio,     link: true },
+    { key: 'website',       value: data?.website,       displayLabel: data?.websiteLabel       || LINK_DEFAULTS.website,       link: true },
+    { key: 'linkedin',      value: data?.linkedin,      displayLabel: data?.linkedinLabel      || LINK_DEFAULTS.linkedin,      link: true },
+    { key: 'github',        value: data?.github,        displayLabel: data?.githubLabel        || LINK_DEFAULTS.github,        link: true },
+    { key: 'googleScholar', value: data?.googleScholar, displayLabel: data?.googleScholarLabel || LINK_DEFAULTS.googleScholar, link: true },
+    { key: 'portfolio',     value: data?.portfolio,     displayLabel: data?.portfolioLabel     || LINK_DEFAULTS.portfolio,     link: true },
   ].filter((x) => x.value);
 
   const renderContactLine = (items) => {
@@ -324,7 +329,7 @@ export default function CVDocument({ data }) {
           )}
           {item.link ? (
             <Link src={asHref(item.value)} style={styles.link}>
-              {item.value}
+              {item.displayLabel || item.value}
             </Link>
           ) : (
             <Text style={{ fontSize: 9.96, color: C.text }}>{item.value}</Text>
