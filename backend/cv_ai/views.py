@@ -149,7 +149,7 @@ def improve_cv(request):
                     yield f'data: {text}\n\n'
             yield 'data: [DONE]\n\n'
         except Exception as e:
-            err_json = json.dumps({'message': f'[ERROR] {str(e)}', 'patch': None})
+            err_json = json.dumps({'error': f'[ERROR] {str(e)}', 'patch': None})
             yield f'data: {err_json}\n\n'
             yield 'data: [DONE]\n\n'
 
@@ -542,15 +542,16 @@ def validate_and_merge(request):
         for field, extracted_value in extracted_data.items():
             current_value = current_data.get(field)
             
-            # Skip empty values and arrays/dicts
-            if not extracted_value or isinstance(extracted_value, (list, dict)):
-                continue
-            if not current_value or isinstance(current_value, (list, dict)):
+            if not extracted_value or not current_value:
                 continue
             
-            # Compare string values
-            ext_str = str(extracted_value).strip()
-            curr_str = str(current_value).strip()
+            # Deep compare arrays and dicts via JSON serialization
+            if isinstance(extracted_value, (list, dict)) or isinstance(current_value, (list, dict)):
+                ext_str = json.dumps(extracted_value, ensure_ascii=False, default=str)
+                curr_str = json.dumps(current_value, ensure_ascii=False, default=str)
+            else:
+                ext_str = str(extracted_value).strip()
+                curr_str = str(current_value).strip()
             
             if ext_str and curr_str and ext_str.lower() != curr_str.lower():
                 conflicts.append({

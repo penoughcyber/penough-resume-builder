@@ -12,6 +12,8 @@ const BLANK_EDUCATION = {
   hidden: false,
 };
 
+const uid = () => crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
 export default function EducationEditor({ education = [], onChange }) {
   const [openIndex, setOpenIndex] = useState(null);
   const list = education;
@@ -25,7 +27,7 @@ export default function EducationEditor({ education = [], onChange }) {
 
   const addEntry = () => {
     const newIndex = list.length;
-    onChange([...list, { ...BLANK_EDUCATION }]);
+    onChange([...list, { ...BLANK_EDUCATION, _id: uid() }]);
     setOpenIndex(newIndex);
   };
 
@@ -68,7 +70,7 @@ export default function EducationEditor({ education = [], onChange }) {
           const isOpen = openIndex === index;
           return (
             <div
-              key={index}
+              key={edu._id ?? index}
               className={`exp-entry ${edu.hidden ? 'exp-entry--hidden' : ''} ${isOpen ? 'exp-entry--open' : ''}`}
             >
               {/* Compact row */}

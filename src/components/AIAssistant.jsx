@@ -171,25 +171,32 @@ export default function AIAssistant({ data, onApply }) {
                 // onChunk — try to show partial message text live
                 (chunk) => {
                     accumulated += chunk;
-                    const match = accumulated.match(/"message"\s*:\s*"((?:[^"\\]|\\[\s\S])*)(?:"|$)/s);
+                    // Also try matching 'error' key for mid-stream error preview
+                    const errorMatch = accumulated.match(/"error"\s*:\s*"((?:[^"\\]|\\.)*)/);
+                    const msgMatch = accumulated.match(/"message"\s*:\s*"((?:[^"\\]|\\.)*)/);
+                    const match = errorMatch || msgMatch;
                     if (match) {
-                        const partial = match[1]
-                            .replace(/\\n/g, '\n')
-                            .replace(/\\"/g, '"')
-                            .replace(/\\t/g, '\t')
-                            .replace(/\\\\/g, '\\');
+                        let partial = match[1];
+                        partial = partial.replace(/\\(.)/g, (_, c) => {
+                            if (c === 'n') return '\n';
+                            if (c === 't') return '\t';
+                            if (c === '"') return '"';
+                            if (c === '\\') return '\\';
+                            return c;
+                        });
                         setStreamingText(partial);
                     }
                 },
                 // onDone
                 (fullText) => {
-                    const { message, patch } = parseAiChatResponse(fullText);
+                    const { message, patch, isError } = parseAiChatResponse(fullText);
                     const aiMsg = {
                         id: uid(),
                         role: 'assistant',
                         text: message,
                         patch,
                         applied: false,
+                        isError,
                         rawResponse: fullText,
                     };
                     setMessages((prev) => [...prev, aiMsg]);

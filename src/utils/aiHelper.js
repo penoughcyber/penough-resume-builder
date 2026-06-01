@@ -92,20 +92,20 @@ export function parseAiChatResponse(rawText) {
 
     try {
         const obj = JSON.parse(cleaned);
-        const message =
-            typeof obj.message === 'string' && obj.message.trim()
+        const isError = typeof obj.error === 'string' && obj.error.trim().length > 0;
+        const message = isError
+            ? obj.error.trim()
+            : typeof obj.message === 'string' && obj.message.trim()
                 ? obj.message.trim()
-                : typeof obj.error === 'string'
-                  ? obj.error
-                  : 'Done.';
+                : 'Done.';
         const patch =
             obj.patch && typeof obj.patch === 'object' && !Array.isArray(obj.patch)
                 ? obj.patch
                 : null;
-        return { message, patch };
+        return { message, patch, isError };
     } catch (_) {
         // If totally unparseable, surface the raw text as the message
-        return { message: rawText.trim() || 'No response received.', patch: null };
+        return { message: rawText.trim() || 'No response received.', patch: null, isError: false };
     }
 }
 

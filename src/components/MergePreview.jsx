@@ -35,7 +35,7 @@ export default function MergePreview({
   const sectionGroups = {
     personal: {
       title: '👤 Personal Information',
-      fields: ['name', 'email', 'phone', 'address', 'website', 'linkedin', 'github'],
+      fields: ['name', 'email', 'phone', 'address', 'website', 'linkedin', 'github', 'googleScholar', 'portfolio'],
     },
     professional: {
       title: '💼 Professional Section',

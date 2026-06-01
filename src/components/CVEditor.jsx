@@ -137,11 +137,12 @@ export default function CVEditor({ data, onDataChange }) {
     onDataChange({ ...data, volunteering: arrayFromText(raw) });
   };
 
-  const textField = (key, label, optional) => (
+  const textField = (key, label, optional, type) => (
     <FormField
       key={key}
       id={key}
       label={label}
+      type={type || 'text'}
       value={data[key]}
       onChange={(v) => handleChange(key, v)}
       placeholder={PLACEHOLDERS[key]}
@@ -278,27 +279,27 @@ export default function CVEditor({ data, onDataChange }) {
         {textField('name', 'Full Name')}
         {textField('tagline', 'Tagline / Professional Title')}
         {textField('address', 'Location (City, Country)')}
-        {textField('email', 'Email Address')}
-        {textField('phone', 'Phone Number')}
+        {textField('email', 'Email Address', false, 'email')}
+        {textField('phone', 'Phone Number', false, 'tel')}
 
         <div className="link-field-group">
-          {textField('website', 'Work Website', true)}
+          {textField('website', 'Work Website', true, 'url')}
           <FormField id="websiteLabel" label="Display Text" value={data.websiteLabel} onChange={(v) => handleChange('websiteLabel', v)} placeholder="e.g. My Website" optional />
         </div>
         <div className="link-field-group">
-          {textField('linkedin', 'LinkedIn Profile', true)}
+          {textField('linkedin', 'LinkedIn Profile', true, 'url')}
           <FormField id="linkedinLabel" label="Display Text" value={data.linkedinLabel} onChange={(v) => handleChange('linkedinLabel', v)} placeholder="e.g. Ashfaq Hossain" optional />
         </div>
         <div className="link-field-group">
-          {textField('github', 'GitHub', true)}
+          {textField('github', 'GitHub', true, 'url')}
           <FormField id="githubLabel" label="Display Text" value={data.githubLabel} onChange={(v) => handleChange('githubLabel', v)} placeholder="e.g. ashfaq-dev" optional />
         </div>
         <div className="link-field-group">
-          {textField('googleScholar', 'Google Scholar', true)}
+          {textField('googleScholar', 'Google Scholar', true, 'url')}
           <FormField id="googleScholarLabel" label="Display Text" value={data.googleScholarLabel} onChange={(v) => handleChange('googleScholarLabel', v)} placeholder="e.g. Scholar Profile" optional />
         </div>
         <div className="link-field-group">
-          {textField('portfolio', 'Additional Link', true)}
+          {textField('portfolio', 'Additional Link', true, 'url')}
           <FormField id="portfolioLabel" label="Display Text" value={data.portfolioLabel} onChange={(v) => handleChange('portfolioLabel', v)} placeholder="e.g. Portfolio" optional />
         </div>
 

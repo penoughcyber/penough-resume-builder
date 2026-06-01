@@ -47,6 +47,7 @@ export default function FormField({
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
             rows={rows}
+            required={required}
             aria-describedby={hint ? `${inputId}-hint` : undefined}
           />
         ) : (
@@ -57,6 +58,7 @@ export default function FormField({
             value={value ?? ''}
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
+            required={required}
             aria-describedby={hint ? `${inputId}-hint` : undefined}
           />
         )}

@@ -10,6 +10,8 @@ const BLANK_HIGHLIGHT = {
   hidden: false,
 };
 
+const uid = () => crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
 export default function HighlightsEditor({ highlights = [], onChange }) {
   const [openIndex, setOpenIndex] = useState(null);
   const list = highlights;
@@ -23,7 +25,7 @@ export default function HighlightsEditor({ highlights = [], onChange }) {
 
   const addEntry = () => {
     const newIndex = list.length;
-    onChange([...list, { ...BLANK_HIGHLIGHT }]);
+    onChange([...list, { ...BLANK_HIGHLIGHT, _id: uid() }]);
     setOpenIndex(newIndex);
   };
 
@@ -66,7 +68,7 @@ export default function HighlightsEditor({ highlights = [], onChange }) {
           const isOpen = openIndex === index;
           return (
             <div
-              key={index}
+              key={h._id ?? index}
               className={`exp-entry ${h.hidden ? 'exp-entry--hidden' : ''} ${isOpen ? 'exp-entry--open' : ''}`}
             >
               {/* Compact row */}
@@ -165,6 +167,7 @@ export default function HighlightsEditor({ highlights = [], onChange }) {
                     <FormField
                       id={`hl-linkUrl-${index}`}
                       label="Link URL"
+                      type="url"
                       value={h.linkUrl}
                       onChange={(v) => updateAt(index, 'linkUrl', v)}
                       placeholder="https://..."

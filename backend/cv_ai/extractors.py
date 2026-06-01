@@ -57,11 +57,12 @@ class BaseExtractor(ABC):
             "volunteering": [],
             "sectionTitles": {
                 "objective": "Professional Profile",
-                "experiences": "Professional Experience",
+                "experience": "Professional Experience",
                 "education": "Education",
                 "highlights": "Key Achievements",
                 "interests": "Technical Proficiencies",
                 "competencies": "Operational Expertise",
+                "technologies": "Core Tech Stack",
                 "projects": "Projects",
                 "certifications": "Certifications",
                 "volunteering": "Volunteering",

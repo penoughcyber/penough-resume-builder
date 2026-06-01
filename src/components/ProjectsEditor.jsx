@@ -13,6 +13,8 @@ const bulletsToText = (bullets) => (bullets || []).join('\n');
 const textToBullets = (text) =>
   text.split('\n').map((l) => l.replace(/^[-•◦]\s*/, '').trimEnd()).filter(Boolean);
 
+const uid = () => crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
 export default function ProjectsEditor({ projects = [], onChange }) {
   const [openIndex, setOpenIndex] = useState(null);
   const [rawBullets, setRawBullets] = useState('');
@@ -39,7 +41,7 @@ export default function ProjectsEditor({ projects = [], onChange }) {
 
   const addEntry = () => {
     const newIndex = list.length;
-    onChange([...list, { ...BLANK_PROJECT }]);
+    onChange([...list, { ...BLANK_PROJECT, _id: uid() }]);
     setOpenIndex(newIndex);
     setRawBullets('');
   };
@@ -84,7 +86,7 @@ export default function ProjectsEditor({ projects = [], onChange }) {
           const isOpen = openIndex === index;
           return (
             <div
-              key={index}
+              key={proj._id ?? index}
               className={`exp-entry ${proj.hidden ? 'exp-entry--hidden' : ''} ${isOpen ? 'exp-entry--open' : ''}`}
             >
               {/* Compact row */}
@@ -166,6 +168,7 @@ export default function ProjectsEditor({ projects = [], onChange }) {
                   <FormField
                     id={`proj-linkUrl-${index}`}
                     label="Link URL"
+                    type="url"
                     value={proj.linkUrl}
                     onChange={(v) => updateAt(index, 'linkUrl', v)}
                     placeholder="https://github.com/..."

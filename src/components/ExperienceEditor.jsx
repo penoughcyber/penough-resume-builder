@@ -93,6 +93,8 @@ const htmlToBullets = (html) => {
   return bullets.filter(b => b && b.trim());
 };
 
+const uid = () => crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
 export default function ExperienceEditor({ experiences = [], onChange }) {
   const [openIndex, setOpenIndex] = useState(null);
   const [rawBulletsHtml, setRawBulletsHtml] = useState('');
@@ -123,7 +125,7 @@ export default function ExperienceEditor({ experiences = [], onChange }) {
 
   const addEntry = () => {
     const newIndex = list.length;
-    onChange([...list, { ...BLANK_EXPERIENCE }]);
+    onChange([...list, { ...BLANK_EXPERIENCE, _id: uid() }]);
     setOpenIndex(newIndex);
     setRawBulletsHtml('');
   };
@@ -168,7 +170,7 @@ export default function ExperienceEditor({ experiences = [], onChange }) {
           const isOpen = openIndex === index;
           return (
             <div
-              key={index}
+              key={exp._id ?? index}
               className={`exp-entry ${exp.hidden ? 'exp-entry--hidden' : ''} ${isOpen ? 'exp-entry--open' : ''}`}
             >
               {/* ── Compact row ── */}
