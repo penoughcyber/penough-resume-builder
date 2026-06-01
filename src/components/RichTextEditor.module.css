@@ -1,0 +1,284 @@
+.richTextEditor {
+  margin-bottom: 16px;
+}
+
+.richTextEditor.filled .editorWrapper {
+  border-color: #10b981;
+}
+
+.label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.editorWrapper {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.editorWrapper:focus-within {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 10px;
+  background: linear-gradient(to bottom, #fafafa, #f5f5f5);
+  border-bottom: 1px solid #e5e7eb;
+  flex-wrap: wrap;
+}
+
+.toolbarGroup {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.toolbarBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.toolbarBtn:hover {
+  background: #fff;
+  border-color: #d1d5db;
+  color: #1f2937;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.toolbarBtn:active {
+  background: #f3f4f6;
+  transform: translateY(1px);
+}
+
+.toolbarBtn.active {
+  background: #6366f1;
+  border-color: #6366f1;
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(99, 102, 241, 0.3);
+}
+
+.toolbarBtn.active:hover {
+  background: #5558e3;
+  border-color: #5558e3;
+  color: #fff;
+}
+
+.toolbarBtn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.separator {
+  width: 1px;
+  height: 24px;
+  background: #e5e7eb;
+  margin: 0 8px;
+  flex-shrink: 0;
+}
+
+.editor {
+  min-height: 120px;
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #1f2937;
+  outline: none;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.editor:empty::before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  pointer-events: none;
+  font-style: italic;
+}
+
+/* Rich text formatting styles */
+.editor b,
+.editor strong {
+  font-weight: 700;
+  color: #111827;
+}
+
+.editor i,
+.editor em {
+  font-style: italic;
+}
+
+.editor u {
+  text-decoration: underline;
+  text-decoration-color: #6366f1;
+  text-underline-offset: 2px;
+}
+
+.editor a {
+  color: #6366f1;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.editor a:hover {
+  color: #4f46e5;
+}
+
+/* Bullet list styles */
+.editor ul {
+  margin: 10px 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.editor ul li {
+  position: relative;
+  padding-left: 22px;
+  margin-bottom: 8px;
+  line-height: 1.7;
+}
+
+.editor ul li:last-child {
+  margin-bottom: 0;
+}
+
+/* Default bullet style - filled circle */
+.editor ul li::before {
+  content: '●';
+  position: absolute;
+  left: 2px;
+  color: #2d3748;
+  font-size: 5px;
+  line-height: 1;
+  top: 10px;
+}
+
+/* Filled bullet style - solid dark circle */
+.editor ul.bullet-filled li::before,
+.editor :global(ul.bullet-filled) li::before {
+  content: '●';
+  font-size: 5px;
+  top: 10px;
+  left: 2px;
+  color: #2d3748;
+}
+
+/* Hollow bullet style - matches the preview/PDF size exactly */
+.editor ul.bullet-hollow li::before,
+.editor :global(ul.bullet-hollow) li::before {
+  content: '◦';
+  font-size: 14px;
+  top: 4px;
+  left: -1px;
+  color: #2d3748;
+}
+
+/* Plain text paragraphs - clean spacing */
+.editor p,
+.editor div:not(:empty) {
+  margin: 0 0 8px 0;
+  line-height: 1.7;
+}
+
+.editor p:last-child,
+.editor div:last-child {
+  margin-bottom: 0;
+}
+
+/* Ensure empty divs don't take space */
+.editor div:empty {
+  display: none;
+}
+
+/* Line breaks within text */
+.editor br {
+  display: block;
+  content: "";
+  margin-top: 4px;
+}
+
+/* Text alignment */
+.editor [style*="text-align: left"] {
+  text-align: left;
+}
+
+.editor [style*="text-align: center"] {
+  text-align: center;
+}
+
+.editor [style*="text-align: right"] {
+  text-align: right;
+}
+
+.editor [style*="text-align: justify"] {
+  text-align: justify;
+}
+
+.hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.hint i {
+  margin-top: 2px;
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+/* Selection highlight */
+.editor ::selection {
+  background: rgba(99, 102, 241, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .toolbar {
+    padding: 6px 8px;
+    gap: 1px;
+  }
+  
+  .toolbarBtn {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .toolbarBtn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .separator {
+    margin: 0 4px;
+    height: 20px;
+  }
+  
+  .editor {
+    padding: 12px;
+    font-size: 13px;
+  }
+}

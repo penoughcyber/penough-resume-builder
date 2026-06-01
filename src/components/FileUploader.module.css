@@ -1,0 +1,148 @@
+.uploaderContainer {
+  padding: 20px;
+}
+
+.dropZone {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #f9f9f9;
+}
+
+.dropZone:hover {
+  border-color: #4CAF50;
+  background-color: #f0f8f0;
+}
+
+.dropZone.dragging {
+  border-color: #4CAF50;
+  background-color: #e8f5e9;
+  transform: scale(1.02);
+}
+
+.dropContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.dropZone h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.dropZone p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.dragHint {
+  color: #999;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.selectButton {
+  padding: 10px 24px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.selectButton:hover {
+  background-color: #45a049;
+}
+
+.selectButton:active {
+  background-color: #3d8b40;
+}
+
+.progressBar {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress {
+  flex: 1;
+  height: 6px;
+  background-color: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress > div {
+  height: 100%;
+  background-color: #4CAF50;
+  transition: width 0.3s ease;
+}
+
+.progressBar span {
+  min-width: 35px;
+  font-size: 12px;
+  color: #666;
+  text-align: right;
+}
+
+.errorMessage {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background-color: #ffebee;
+  border-left: 4px solid #f44336;
+  border-radius: 4px;
+  color: #c62828;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Compact uploader styles */
+.compactUploader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.uploadButton {
+  padding: 6px 8px;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.uploadButton:hover {
+  border-color: #4CAF50;
+  background-color: #f0f8f0;
+}
+
+.compactError {
+  color: #f44336;
+  font-size: 12px;
+  white-space: nowrap;
+}
